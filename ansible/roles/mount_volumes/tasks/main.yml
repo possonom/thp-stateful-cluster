@@ -1,0 +1,23 @@
+---
+- name: Create mount directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /data
+
+- name: Mount volumes
+  mount:
+    path: /data
+    src: "{{ hostvars[inventory_hostname]['volume_device'] | default('/dev/sdb') }}"
+    fstype: ext4
+    state: mounted
+
+- name: Set permissions on data directory
+  file:
+    path: /data
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'

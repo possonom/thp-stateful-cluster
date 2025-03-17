@@ -1,0 +1,37 @@
+all:
+  children:
+    jump_host:
+      hosts:
+        jump-host:
+          ansible_host: "{{ jump_host_ip }}"
+          ansible_user: root
+    postgres:
+      children:
+        postgres_primary:
+          hosts:
+            postgres-primary:
+              ansible_host: 10.0.1.10
+              ansible_user: root
+              ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q root@{{ jump_host_ip }}"'
+        postgres_replica:
+          hosts:
+            postgres-replica:
+              ansible_host: 10.0.1.11
+              ansible_user: root
+              ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q root@{{ jump_host_ip }}"'
+    redis_rabbitmq:
+      children:
+        redis_rabbitmq_primary:
+          hosts:
+            redis-rabbitmq-primary:
+              ansible_host: 10.0.1.20
+              ansible_user: root
+              ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q root@{{ jump_host_ip }}"'
+        redis_rabbitmq_replica:
+          hosts:
+            redis-rabbitmq-replica:
+              ansible_host: 10.0.1.21
+              ansible_user: root
+              ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q root@{{ jump_host_ip }}"'
+  vars:
+    ansible_python_interpreter: /usr/bin/python3

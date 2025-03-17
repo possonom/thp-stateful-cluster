@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+{% if inventory_hostname in groups['postgres_primary'] %}
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_primary
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_DB: "{{ postgres_db }}"
+    volumes:
+      - /data/postgres/data:/var/lib/postgresql/data
+      - /data/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+
+{% else %}
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_replica
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_DB: "{{ postgres_db }}"
+    volumes:
+      - /data/postgres/data:/var/lib/postgresql/data
+      - /data/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres_network
+{% endif %}
+
+networks:
+  postgres_network:
+    driver: bridge

@@ -1,0 +1,23 @@
+---
+# Common variables
+ansible_python_interpreter: /usr/bin/python3
+
+# PostgreSQL variables
+postgres_user: postgres
+postgres_password: "{{ vault_postgres_password }}"
+postgres_db: postgres
+postgres_replication_password: "{{ vault_postgres_replication_password }}"
+
+# Redis variables
+redis_password: "{{ vault_redis_password }}"
+
+# RabbitMQ variables
+rabbitmq_user: admin
+rabbitmq_password: "{{ vault_rabbitmq_password }}"
+rabbitmq_erlang_cookie: "{{ vault_rabbitmq_erlang_cookie }}"
+rabbitmq_password_hash: "{{ vault_rabbitmq_password_hash }}"
+
+# S3 backup variables
+s3_bucket_name: "your-hetzner-bucket"
+s3_access_key: "{{ vault_s3_access_key }}"
+s3_secret_key: "{{ vault_s3_secret_key }}"

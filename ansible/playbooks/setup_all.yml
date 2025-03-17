@@ -1,0 +1,26 @@
+---
+- name: Setup Jump Host
+  hosts: jump_host
+  become: true
+  roles:
+    - common
+    - jump_host
+
+- name: Setup PostgreSQL Servers
+  hosts: postgres
+  become: true
+  roles:
+    - common
+    - docker
+    - mount_volumes
+    - postgres
+
+- name: Setup Redis and RabbitMQ Servers
+  hosts: redis_rabbitmq
+  become: true
+  roles:
+    - common
+    - docker
+    - mount_volumes
+    - redis
+    - rabbitmq

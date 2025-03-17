@@ -1,0 +1,17 @@
+---
+# This playbook can be used to set up a K3s cluster in the future
+- name: Setup K3s Master
+  hosts: k3s_master
+  become: true
+  roles:
+    - common
+    - docker
+    - k3s_master
+
+- name: Setup K3s Workers
+  hosts: k3s_workers
+  become: true
+  roles:
+    - common
+    - docker
+    - k3s_worker

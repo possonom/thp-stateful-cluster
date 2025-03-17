@@ -1,0 +1,49 @@
+# This file can be used to add a K3s cluster in a separate subnet
+# Rename to k3s-subnet.tf to enable
+
+# K3s subnet
+resource "hcloud_network_subnet" "k3s_subnet" {
+  network_id   = hcloud_network.private_network.id
+  type         = "cloud"
+  network_zone = "eu-central"
+  ip_range     = "10.0.2.0/24"
+}
+
+# K3s master node
+resource "hcloud_server" "k3s_master" {
+  name        = "k3s-master"
+  image       = "ubuntu-22.04"
+  server_type = "cax21" # ARM64 instance
+  location    = "nbg1"
+  ssh_keys    = [hcloud_ssh_key.default.id]
+
+  network {
+    network_id = hcloud_network.private_network.id
+    ip         = "10.0.2.10"
+  }
+
+  public_net {
+    ipv4_enabled = false
+    ipv6_enabled = false
+  }
+}
+
+# K3s worker nodes
+resource "hcloud_server" "k3s_worker" {
+  count       = 2
+  name        = "k3s-worker-${count.index + 1}"
+  image       = "ubuntu-22.04"
+  server_type = "cax21" # ARM64 instance
+  location    = "nbg1"
+  ssh_keys    = [hcloud_ssh_key.default.id]
+
+  network {
+    network_id = hcloud_network.private_network.id
+    ip         = "10.0.2.${count.index + 11}"
+  }
+
+  public_net {
+    ipv4_enabled = false
+    ipv6_enabled = false
+  }
+}

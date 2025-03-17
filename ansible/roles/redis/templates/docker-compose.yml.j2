@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+{% if inventory_hostname in groups['redis_rabbitmq_primary'] %}
+  redis:
+    image: redis:7-alpine
+    container_name: redis_primary
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - /data/redis/data:/data
+      - /data/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    networks:
+      - redis_network
+
+{% else %}
+  redis:
+    image: redis:7-alpine
+    container_name: redis_replica
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - /data/redis/data:/data
+      - /data/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    networks:
+      - redis_network
+{% endif %}
+
+networks:
+  redis_network:
+    driver: bridge

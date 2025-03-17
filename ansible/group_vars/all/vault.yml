@@ -1,0 +1,17 @@
+---
+# Encrypted passwords - replace with actual encrypted values
+vault_postgres_password: securepassword
+vault_postgres_replication_password: replicatorpassword
+vault_redis_password: redispassword
+vault_rabbitmq_password: rabbitmqpassword
+vault_<boltArtifact id="hetzner-stateful-cluster" title="Hetzner Cloud Stateful Cluster with Terraform and Ansible">
+<boltAction type="file" filePath="ansible/group_vars/all/vault.yml">---
+# Encrypted passwords - replace with actual encrypted values
+vault_postgres_password: securepassword
+vault_postgres_replication_password: replicatorpassword
+vault_redis_password: redispassword
+vault_rabbitmq_password: rabbitmqpassword
+vault_rabbitmq_erlang_cookie: erlangcookievalue
+vault_rabbitmq_password_hash: passwordhashvalue
+vault_s3_access_key: s3accesskey
+vault_s3_secret_key: s3secretkey

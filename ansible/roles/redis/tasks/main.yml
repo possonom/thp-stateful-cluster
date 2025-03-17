@@ -1,0 +1,26 @@
+---
+- name: Create Redis directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /data/redis
+    - /data/redis/data
+
+- name: Create docker-compose.yml for Redis
+  template:
+    src: docker-compose.yml.j2
+    dest: /data/redis/docker-compose.yml
+    mode: '0644'
+
+- name: Create Redis configuration
+  template:
+    src: "{{ 'redis-primary.conf.j2' if inventory_hostname in groups['redis_rabbitmq_primary'] else 'redis-replica.conf.j2' }}"
+    dest: /data/redis/redis.conf
+    mode: '0644'
+
+- name: Start Redis containers
+  shell: cd /data/redis && docker-compose up -d
+  args:
+    executable: /bin/bash

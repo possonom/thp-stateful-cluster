@@ -1,0 +1,32 @@
+---
+- name: Create RabbitMQ directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /data/rabbitmq
+    - /data/rabbitmq/data
+
+- name: Create docker-compose.yml for RabbitMQ
+  template:
+    src: docker-compose.yml.j2
+    dest: /data/rabbitmq/docker-compose.yml
+    mode: '0644'
+
+- name: Create RabbitMQ configuration
+  template:
+    src: "{{ 'rabbitmq-primary.conf.j2' if inventory_hostname in groups['redis_rabbitmq_primary'] else 'rabbitmq-replica.conf.j2' }}"
+    dest: /data/rabbitmq/rabbitmq.conf
+    mode: '0644'
+
+- name: Create RabbitMQ definitions
+  template:
+    src: definitions.json.j2
+    dest: /data/rabbitmq/definitions.json
+    mode: '0644'
+
+- name: Start RabbitMQ containers
+  shell: cd /data/rabbitmq && docker-compose up -d
+  args:
+    executable: /bin/bash

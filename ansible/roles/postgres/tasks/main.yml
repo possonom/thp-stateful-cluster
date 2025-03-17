@@ -1,0 +1,42 @@
+---
+- name: Create PostgreSQL directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items:
+    - /data/postgres
+    - /data/postgres/data
+    - /data/postgres/backup
+
+- name: Create docker-compose.yml for PostgreSQL
+  template:
+    src: docker-compose.yml.j2
+    dest: /data/postgres/docker-compose.yml
+    mode: '0644'
+
+- name: Create PostgreSQL configuration
+  template:
+    src: "{{ 'postgresql-primary.conf.j2' if inventory_hostname in groups['postgres_primary'] else 'postgresql-replica.conf.j2' }}"
+    dest: /data/postgres/postgresql.conf
+    mode: '0644'
+
+- name: Create backup script
+  template:
+    src: backup-postgres.sh.j2
+    dest: /data/postgres/backup-postgres.sh
+    mode: '0755'
+  when: inventory_hostname in groups['postgres_primary']
+
+- name: Set up cron job for backups
+  cron:
+    name: "PostgreSQL backup"
+    hour: "3"
+    minute: "0"
+    job: "/data/postgres/backup-postgres.sh"
+  when: inventory_hostname in groups['postgres_primary']
+
+- name: Start PostgreSQL containers
+  shell: cd /data/postgres && docker-compose up -d
+  args:
+    executable: /bin/bash
